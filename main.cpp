@@ -130,6 +130,8 @@ int main() {
 				// MIDI: Process matrix button changes
 				// =======================================
 				midi_handler.updateMatrixButtonStates(input_report_buffer);
+				midi_handler.updateKnobStates(input_report_buffer);
+				midi_handler.updateFaderStates(input_report_buffer);
 
 				// =======================================
 				// Read and update Selector Wheel rotation
@@ -162,6 +164,7 @@ int main() {
 				// =======================================
 				// Read and update Knob values
 				// =======================================
+				/*
 				//knob_input_reader.printKnobValues(input_report_buffer);
 				int knob_value_1 = knob_input_reader.getKnobValue(input_report_buffer, 1);
 				int knob_value_2 = knob_input_reader.getKnobValue(input_report_buffer, 2);
@@ -190,7 +193,7 @@ int main() {
 								<< "4: " << std::fixed << std::setprecision(3) << fader_value_4 << " || "
 								<< "        \r"; // Carriage return to overwrite the line
 				std::cout.flush();
-
+				*/
 		}
 
 	// =============================================================================
