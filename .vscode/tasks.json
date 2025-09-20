@@ -1,0 +1,107 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build with cmake",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "configure cmake",
+            "problemMatcher": ["$gcc"],
+            "detail": "Build with CMake (recommended)",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+
+        {
+            "label": "configure cmake",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B",
+                "build",
+                "-S",
+                "."
+            ],
+            "group": "build",
+            "detail": "Configure CMake build system",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+
+        {
+            "label": "clean build",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-rf",
+                "build"
+            ],
+            "group": "build",
+            "detail": "Clean build directory",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+
+        {
+            "label": "build manual (direct g++)",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-Wall",
+                "-Wextra",
+                "-std=c++20",
+                "-I/opt/homebrew/include",
+                "-I.",
+                "main.cpp",
+                "startup_effect.cpp",
+                "-o",
+                "traktor",
+                "-L/opt/homebrew/lib",
+                "-lhidapi"
+            ],
+            "group": "build",
+            "problemMatcher": ["$gcc"],
+            "detail": "Direct g++ compilation (backup method)",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+
+/*
+        {
+            "label": "build main",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-Wall",
+                "-Wextra",
+                // "-g3", // for debuggin on mac
+                "-std=c++20",
+                "-I/opt/homebrew/Cellar/hidapi/0.15.0/include",
+                "main.cpp",
+                "-o",
+                "traktor",
+                "-L/opt/homebrew/Cellar/hidapi/0.15.0/lib",
+                "-lhidapi"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Compile C++ and link HIDAPI for macOS"
+        }
+*/
+    ]
+}
