@@ -9,6 +9,7 @@
 #include <unistd.h> 		// unistd.h gives access to the POSIX operating system API.
 #include <stdint.h> 		// stdint.h gives uint8_t support. uint8_t is an unsigned 8-bit integer type.
 #include <hidapi/hidapi.h>  // HIDAPI library for USB HID device access
+#include <rtmidi/RtMidi.h>	// RtMidi library for MIDI handling
 #include <fcntl.h>          // fcntl.h gives access to the POSIX file control API.
 #include <cstring>          // string.h gives access to C-style string functions.
 #include <chrono>
@@ -25,10 +26,8 @@
 #include "include/led_controller_display.h"		// Include display control module
 
 #include "include/startup_sequence.h"					// Include startup effects module
+#include "include/midi_handler.h"							// Include MIDI handler module
 
-
-//#include "include/led_controller_toggle.h"		// Include LED controller toggle module
-//#include "include/led_scene_controller.h"     // Include LED scene controller module
 
 
 // F1 device identifiers (same as before)
@@ -65,8 +64,10 @@ int main() {
 		KnobInputReader knob_input_reader;
 		// Declare fader input reader
 		FaderInputReader fader_input_reader;
-		// Delare display controller
+		// Declare display controller
 		DisplayController display_controller;
+		// Declare MIDI handler
+		MidiHandler midi_handler;
 		// Declare current effects page variable
 		int current_effect_page = 1;
 
@@ -78,6 +79,9 @@ int main() {
 
 				// Initialize the LED controller
 				initializeLEDController(device);
+
+				// Initialize MIDI handler (NEW)
+				midi_handler.initializeMIDI();
 
 				// Run startup sequence
 				startupSequence(device);
@@ -121,6 +125,11 @@ int main() {
 						std::cerr << "Error, shutting down..." << std::endl;
 						return -1;
 				}
+
+				// =======================================
+				// MIDI: Process matrix button changes
+				// =======================================
+				midi_handler.updateMatrixButtonStates(input_report_buffer);
 
 				// =======================================
 				// Read and update Selector Wheel rotation
@@ -182,43 +191,14 @@ int main() {
 								<< "        \r"; // Carriage return to overwrite the line
 				std::cout.flush();
 
-				// =======================================
-				// Check for button toggles
-				// =======================================
-
-				// Special button toggles (only triggers on press, not hold)
-				//btn_toggle_system.shouldToggleSpecialButton(input_report_buffer, SpecialButton::SHIFT, SpecialLEDButton::SHIFT);
-				//btn_toggle_system.shouldToggleSpecialButton(input_report_buffer, SpecialButton::REVERSE, SpecialLEDButton::REVERSE);
-				//btn_toggle_system.shouldToggleSpecialButton(input_report_buffer, SpecialButton::TYPE, SpecialLEDButton::TYPE);
-				//btn_toggle_system.shouldToggleSpecialButton(input_report_buffer, SpecialButton::SIZE, SpecialLEDButton::SIZE);
-				//btn_toggle_system.shouldToggleSpecialButton(input_report_buffer, SpecialButton::BROWSE, SpecialLEDButton::BROWSE);
-
-				// Control button toggles
-				//btn_toggle_system.shouldToggleControlButton(input_report_buffer, ControlButton::CAPTURE, ControlLEDButton::CAPTURE);
-				//btn_toggle_system.shouldToggleControlButton(input_report_buffer, ControlButton::QUANT, ControlLEDButton::QUANT);
-				//btn_toggle_system.shouldToggleControlButton(input_report_buffer, ControlButton::SYNC, ControlLEDButton::SYNC);
-
-				// Stop button toggles
-				//btn_toggle_system.shouldToggleStopButton(input_report_buffer, StopButton::STOP1, StopLEDButton::STOP1);
-				//btn_toggle_system.shouldToggleStopButton(input_report_buffer, StopButton::STOP2, StopLEDButton::STOP2);
-				//btn_toggle_system.shouldToggleStopButton(input_report_buffer, StopButton::STOP3, StopLEDButton::STOP3);
-				//btn_toggle_system.shouldToggleStopButton(input_report_buffer, StopButton::STOP4, StopLEDButton::STOP4);
-
-				// Matrix button toggles
-				//for (int row = 1; row <= 4; row++) {
-				//	for (int col = 1; col <= 4; col++) {
-				//		btn_toggle_system.shouldToggleMatrixButton(input_report_buffer, row, col);
-				//	}
-				//}
-
-				// Update button states for next frame
-				//btn_toggle_system.updateButtonStates(input_report_buffer);
-
 		}
 
 	// =============================================================================
 	// CODE CLOSES
 	//=============================================================================
+		// Clean up MIDI (NEW)
+	midi_handler.cleanup();
+	
 	// Close the device
 	hid_close(device);
 

@@ -33,14 +33,32 @@ else()
     find_library(HIDAPI_LIBRARY NAMES hidapi-libusb hidapi)
 endif()
 
-# Check if we found everything
-if(NOT HIDAPI_INCLUDE_DIR OR NOT HIDAPI_LIBRARY)
-    message(FATAL_ERROR "HIDAPI not found. On macOS: brew install hidapi")
+# Find RtMidi
+if (APPLE)
+    find_path(RTMIDI_INCLUDE_DIR 
+        NAMES rtmidi/RtMidi.h
+        PATHS 
+            /opt/homebrew/include
+            /usr/local/include
+        NO_DEFAULT_PATH
+    )
+    
+    find_library(RTMIDI_LIBRARY 
+        NAMES rtmidi
+        PATHS 
+            /opt/homebrew/lib
+            /usr/local/lib
+        NO_DEFAULT_PATH
+    )
+else()
+    find_path(RTMIDI_INCLUDE_DIR rtmidi/RtMidi.h)
+    find_library(RTMIDI_LIBRARY NAMES rtmidi)
 endif()
 
-# Print what we found (helpful for debugging)
-message(STATUS "HIDAPI include dir: ${HIDAPI_INCLUDE_DIR}")
-message(STATUS "HIDAPI library: ${HIDAPI_LIBRARY}")
+# Check if we found everything
+if(NOT HIDAPI_INCLUDE_DIR OR NOT HIDAPI_LIBRARY OR NOT RTMIDI_INCLUDE_DIR OR NOT RTMIDI_LIBRARY)
+    message(FATAL_ERROR "HIDAPI or RtMidi not found. On macOS: brew install hidapi rtmidi^")
+endif()
 
 # Add executable
 add_executable(f1_driver 
@@ -52,13 +70,15 @@ add_executable(f1_driver
     src/led_controller_base.cpp
     src/led_controller_display.cpp
     src/startup_sequence.cpp
+    src/midi_handler.cpp
 )
 
 # Include directories
 target_include_directories(f1_driver PRIVATE 
     ${HIDAPI_INCLUDE_DIR}
+    ${RTMIDI_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # Link the HIDAPI library
-target_link_libraries(f1_driver PRIVATE ${HIDAPI_LIBRARY})
+target_link_libraries(f1_driver PRIVATE ${HIDAPI_LIBRARY} ${RTMIDI_LIBRARY})
