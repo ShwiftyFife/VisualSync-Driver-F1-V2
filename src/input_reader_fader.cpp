@@ -206,11 +206,8 @@ uint16_t FaderInputReader::extractRawFaderValue(const unsigned char* buffer, int
 * @return: Normalized float value
 */
 float FaderInputReader::rawToNormalized(uint16_t raw_value) const {
-    // Simple division to get 0.000 to 1.000 range
-    float normalized_value = (float)raw_value / (float)FADER_RAW_MAX;
-    
-    // Round to 3 decimal places for cleaner output
-    normalized_value = std::round(normalized_value * 1000.0f) / 1000.0f;
+    // Simple division to get 0 to 127 range
+    int normalized_value = (float)raw_value / (float)FADER_RAW_MAX * 127.0f;
     
     return normalized_value;
 }

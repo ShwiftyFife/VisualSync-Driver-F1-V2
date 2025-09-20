@@ -163,13 +163,9 @@ uint16_t KnobInputReader::extractRawKnobValue(const unsigned char* buffer, int k
 * @return: Normalized float value
 */
 float KnobInputReader::rawToNormalized(uint16_t raw_value) const {
-    // Simple division to get 0.000 to 1.000 range
-    float normalized_value = (float)raw_value / (float)KNOB_RAW_MAX;
+    // Simple division to get 0 to 127 range
+    int normalized_value = (float)raw_value / (float)KNOB_RAW_MAX * 127.0f;
     
-    // round to 3 decimal places for cleaner output
-    normalized_value = std::round(normalized_value * 1000.0f) / 1000.0f;
-
-    // Return the normalized value
     return normalized_value;
 }
 

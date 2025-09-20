@@ -59,20 +59,16 @@ int main() {
 		// Open the device:
 		// Declare pointer to HID device handle
 		hid_device *device;
-		// Declare button toggle system
-		//ButtonToggleSystem btn_toggle_system;
 		// Declare wheel reader system
-		//WheelInputReader wheel_input_reader;
+		WheelInputReader wheel_input_reader;
 		// Declare knob input reader
-		//KnobInputReader knob_input_reader;
+		KnobInputReader knob_input_reader;
 		// Declare fader input reader
-		//FaderInputReader fader_input_reader;
-		// Declare current effects page variable
-		//int current_effect_page = 1;
+		FaderInputReader fader_input_reader;
 		// Delare display controller
-		//DisplayController display_controller;
-		// Declare LED scene controller
-		//SceneController scene_controller;
+		DisplayController display_controller;
+		// Declare current effects page variable
+		int current_effect_page = 1;
 
 		// Open the device using the VendorID, ProductID, and optionally the Serial number.
 		// If the device is opened successfully, the pointer will not be null.
@@ -81,24 +77,18 @@ int main() {
 				std::cout << "- Opening Traktor Kontrol F1..." << std::endl;
 
 				// Initialize the LED controller
-				//initializeLEDController(device);
+				initializeLEDController(device);
 
 				// Run startup sequence
-				//startupSequence(device);
-
-				// Initialize button toggle system
-				//btn_toggle_system.initialize();
+				startupSequence(device);
 
 				// Initialize wheel input reader and set first page
-				//wheel_input_reader.initialize();
+				wheel_input_reader.initialize();
 
 				// Set first effects page on display
 				// Turn on left dot to indicate page is loaded
-				//display_controller.setDisplayNumber(current_effect_page);
-				//display_controller.setDisplayDot(1, true);
-
-				// Load first effects page scene
-				//scene_controller.setEffectsPageScene(current_effect_page);
+				display_controller.setDisplayNumber(current_effect_page);
+				display_controller.setDisplayDot(1, true);
 
 				// Send success message
 				std::cout << "" << std::endl;
@@ -136,65 +126,61 @@ int main() {
 				// Read and update Selector Wheel rotation
 				// =======================================
 				// Get wheel direction
-				//WheelDirection selector_wheel_direction = wheel_input_reader.checkWheelRotation(input_report_buffer);
+				WheelDirection selector_wheel_direction = wheel_input_reader.checkWheelRotation(input_report_buffer);
 
 				// Select effects page accordingly
-				//if (selector_wheel_direction == WheelDirection::CLOCKWISE) {
-				//		// increase page by 1
-        //		current_effect_page = std::min(current_effect_page + 1, 99);
-				//		// Update display
-				//		display_controller.setDisplayDot(1, false); // Turn off left dot when changing page
-				//		display_controller.setDisplayNumber(current_effect_page);
-				//	}
-				//	else if (selector_wheel_direction == WheelDirection::COUNTER_CLOCKWISE) {
-				//		// decrease page by 1
-				//		current_effect_page = std::max(current_effect_page - 1, 1);
-				//		// Update display
-				//		display_controller.setDisplayDot(1, false); // Turn off left dot when changing page
-				//		display_controller.setDisplayNumber(current_effect_page);
-				//	}
+				if (selector_wheel_direction == WheelDirection::CLOCKWISE) {
+						// increase page by 1
+        		current_effect_page = std::min(current_effect_page + 1, 99);
+						// Update display
+						display_controller.setDisplayDot(1, false); // Turn off left dot when changing page
+						display_controller.setDisplayNumber(current_effect_page);
+					}
+					else if (selector_wheel_direction == WheelDirection::COUNTER_CLOCKWISE) {
+						// decrease page by 1
+						current_effect_page = std::max(current_effect_page - 1, 1);
+						// Update display
+						display_controller.setDisplayDot(1, false); // Turn off left dot when changing page
+						display_controller.setDisplayNumber(current_effect_page);
+					}
 
 				// Load effects page on selector wheel button press
-				//if (isSpecialButtonPressed(input_report_buffer, SpecialButton::SELECTOR_WHEEL)) {
-				//		// Turn on left dot to indicate page is loaded
-				//		display_controller.setDisplayDot(1, true);
-				//		// Load effects page scene
-				//		scene_controller.setEffectsPageScene(current_effect_page);
-				//		// Reset button states
-				//		btn_toggle_system.resetAllToggleStates();
-				//}
+				if (isSpecialButtonPressed(input_report_buffer, SpecialButton::SELECTOR_WHEEL)) {
+						// Turn on left dot to indicate page is loaded
+						display_controller.setDisplayDot(1, true);
+				}
 
 				// =======================================
 				// Read and update Knob values
 				// =======================================
 				//knob_input_reader.printKnobValues(input_report_buffer);
-				//float knob_value_1 = knob_input_reader.getKnobValue(input_report_buffer, 1);
-				//float knob_value_2 = knob_input_reader.getKnobValue(input_report_buffer, 2);
-				//float knob_value_3 = knob_input_reader.getKnobValue(input_report_buffer, 3);
-				//float knob_value_4 = knob_input_reader.getKnobValue(input_report_buffer, 4);
+				int knob_value_1 = knob_input_reader.getKnobValue(input_report_buffer, 1);
+				int knob_value_2 = knob_input_reader.getKnobValue(input_report_buffer, 2);
+				int knob_value_3 = knob_input_reader.getKnobValue(input_report_buffer, 3);
+				int knob_value_4 = knob_input_reader.getKnobValue(input_report_buffer, 4);
 
 				// =======================================
 				// Read and update Fader values
 				// =======================================
-				//fader_input_reader.printFaderValues(input_report_buffer);
-				//float fader_value_1 = fader_input_reader.getFaderValue(input_report_buffer, 1);
-				//float fader_value_2 = fader_input_reader.getFaderValue(input_report_buffer, 2);
-				//float fader_value_3 = fader_input_reader.getFaderValue(input_report_buffer, 3);
-				//float fader_value_4 = fader_input_reader.getFaderValue(input_report_buffer, 4);
+				fader_input_reader.printFaderValues(input_report_buffer);
+				int fader_value_1 = fader_input_reader.getFaderValue(input_report_buffer, 1);
+				int fader_value_2 = fader_input_reader.getFaderValue(input_report_buffer, 2);
+				int fader_value_3 = fader_input_reader.getFaderValue(input_report_buffer, 3);
+				int fader_value_4 = fader_input_reader.getFaderValue(input_report_buffer, 4);
 
 				// Print knob and fader values for debugging
-				//std::cout << "Knob Values: "
-				//				<< "1: " << std::fixed << std::setprecision(3) << knob_value_1 << " | "
-				//				<< "2: " << std::fixed << std::setprecision(3) << knob_value_2 << " | "
-				//				<< "3: " << std::fixed << std::setprecision(3) << knob_value_3 << " | "
-				//				<< "4: " << std::fixed << std::setprecision(3) << knob_value_4 << " || "
-				//				<< "Fader Values: "
-				//				<< "1: " << std::fixed << std::setprecision(3) << fader_value_1 << " | "
-				//				<< "2: " << std::fixed << std::setprecision(3) << fader_value_2 << " | "
-				//				<< "3: " << std::fixed << std::setprecision(3) << fader_value_3 << " | "
-				//				<< "4: " << std::fixed << std::setprecision(3) << fader_value_4 << " || "
-				//				<< "        \r"; // Carriage return to overwrite the line
-				//std::cout.flush();
+				std::cout << "Knob Values: "
+								<< "1: " << std::fixed << std::setprecision(3) << knob_value_1 << " | "
+								<< "2: " << std::fixed << std::setprecision(3) << knob_value_2 << " | "
+								<< "3: " << std::fixed << std::setprecision(3) << knob_value_3 << " | "
+								<< "4: " << std::fixed << std::setprecision(3) << knob_value_4 << " || "
+								<< "Fader Values: "
+								<< "1: " << std::fixed << std::setprecision(3) << fader_value_1 << " | "
+								<< "2: " << std::fixed << std::setprecision(3) << fader_value_2 << " | "
+								<< "3: " << std::fixed << std::setprecision(3) << fader_value_3 << " | "
+								<< "4: " << std::fixed << std::setprecision(3) << fader_value_4 << " || "
+								<< "        \r"; // Carriage return to overwrite the line
+				std::cout.flush();
 
 				// =======================================
 				// Check for button toggles
